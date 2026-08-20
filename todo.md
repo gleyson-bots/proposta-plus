@@ -1,0 +1,31 @@
+# Project TODO
+
+- [x] Clonar e auditar o branch `main` do repositório de referência `gleyson-bots/proposta-plus`, inventariando rotas, entidades, permissões, integrações e comportamentos funcionais.
+- [x] Documentar as diferenças entre a referência e a recriação e definir o mapa de cobertura de funcionalidades.
+- [x] Definir a estética visual Art Déco: paleta preto profundo e dourado, tipografia serifada de destaque, geometria simétrica, molduras angulares e componentes responsivos acessíveis.
+- [x] Modelar e migrar a base de dados persistente para clientes, catálogo, propostas, itens, histórico de estados, configurações da empresa e metadados de ficheiros.
+- [x] Implementar autenticação OAuth e perfis de utilizador com controlo de acesso por papéis `admin` e `user` em servidor e interface.
+- [x] Implementar criação, edição, pesquisa, listagem e arquivo de clientes com dados de contacto e empresa.
+- [x] Implementar criação, edição, pesquisa, listagem e arquivo de produtos e serviços com nome, descrição, categoria e preço unitário.
+- [x] Recriar o configurador comercial da referência através de campos de proposta extensíveis para condições de pagamento, entrada, financiamento, comissões, elegibilidade e atributos do catálogo.
+- [x] Implementar criação, edição, duplicação, consulta e eliminação controlada de propostas com cliente, itens de linha, quantidades, preços, descontos e cálculo de subtotais, impostos e total.
+- [x] Implementar o fluxo de estados Rascunho → Enviada → Aceite / Recusada / Expirada, com regras de transição validadas no servidor.
+- [x] Implementar cadeia de aprovação comercial configurável, preservando o comportamento de escalonamento da referência sem substituir os papéis globais `admin` e `user`.
+- [x] Implementar dashboard com total de propostas, taxa de conversão, valor total em aberto e propostas recentes, calculados a partir de dados persistidos.
+- [x] Implementar histórico de auditoria para cada alteração de estado, registando data, utilizador responsável, estado anterior e estado seguinte.
+- [x] Implementar as configurações da empresa, incluindo nome, logótipo, morada, NIF, contacto e campos fiscais usados nos documentos.
+- [x] Implementar pré-visualização pública e autenticada da proposta com composição profissional e dados dinâmicos da empresa, cliente, itens, impostos e anexos.
+- [x] Implementar exportação de PDF no servidor, usando os dados persistidos e a identidade visual/configurações atuais da empresa.
+- [x] Integrar armazenamento S3 para upload seguro do logótipo e anexos de propostas, persistindo metadados e referências de ficheiro.
+- [x] Integrar envio automático de email quando uma proposta passa para Enviada, com ligação de visualização e PDF anexado, garantindo idempotência e registo do resultado.
+- [ ] Configurar a integração transacional Resend através de `RESEND_API_KEY` e `RESEND_FROM_EMAIL`, validando remetente, domínio e resposta de entrega antes de ativar o envio automático.
+- [x] Criar testes de integração sobre persistência e auditoria com uma base de dados isolada, sem introduzir dados de demonstração no ambiente de produção.
+- [ ] Executar manualmente os fluxos críticos completos com dados comerciais autorizados, incluindo envio, aprovações, PDF, anexos e ligação pública.
+- [x] Atualizar a documentação de utilização, variáveis de integração necessárias e decisões de arquitetura.
+- [ ] Confirmar no domínio da empresa, por meio de uma proposta real criada pela equipa, a validação DNS do remetente Resend e a entrega do primeiro email comercial.
+- [x] Adicionar pesquisa real de clientes e catálogo no servidor e na interface, com filtros verificáveis.
+- [x] Expor campos comerciais explícitos para pagamento, entrada, financiamento, comissões, elegibilidade e atributos do catálogo no editor de propostas.
+- [x] Reforçar a cadeia de aprovação com escalonamento ordenado, bloqueio de etapas seguintes e impacto verificável no envio da proposta.
+- [x] Acrescentar testes de regras de aprovação e geração documental com dependências simuladas.
+- [ ] Registar a validação funcional de cenários críticos e de erro que dependem de dados criados por utilizadores autorizados.
+- [ ] Publicar a versão recriada e validada no branch `recriado-fullstack` de `gleyson-bots/proposta-plus`, preservando o branch `main` original.
