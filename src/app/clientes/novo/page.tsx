@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { createClient } from "@/app/actions";
+import { requireUser } from "@/lib/auth";
 
-export default function NewClientPage() {
+export default async function NewClientPage() {
+  await requireUser();
   return <>
     <header className="pageHeader">
-      <div><p className="eyebrow">NOVO REGISTRO</p><h1>Cadastrar cliente</h1><p className="subtitle">Adicione os dados essenciais para começar uma negociação.</p></div>
+      <div><p className="eyebrow">NOVO REGISTRO</p><h1>Cadastrar cliente</h1><p className="subtitle">O cliente será vinculado a você e herdará o escopo da sua hierarquia.</p></div>
     </header>
     <form action={createClient} className="formCard">
       <div className="formGrid">
