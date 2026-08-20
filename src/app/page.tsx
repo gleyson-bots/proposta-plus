@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   const actor = await requireUser();
   const visibleIds = await getManagedUserIds(actor);
-  const scope = { organizationId: actor.organizationId, OR: [{ ownerId: null }, { ownerId: { in: visibleIds } }] } as const;
+  const scope = { organizationId: actor.organizationId, OR: [{ ownerId: null }, { ownerId: { in: visibleIds } }] };
 
   const [proposals, clients] = await Promise.all([
     prisma.proposal.findMany({
