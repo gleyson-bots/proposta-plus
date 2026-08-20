@@ -27,6 +27,15 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   BROKER: "Corretor",
 };
 
+export const ROLE_RANK: Record<UserRole, number> = {
+  BROKER: 1,
+  MANAGER: 2,
+  SUPERVISOR: 3,
+  DIRECTOR: 4,
+  VP: 5,
+  ADMIN: 6,
+};
+
 const permissions: Record<UserRole, Permission[] | "*"> = {
   ADMIN: "*",
   VP: "*",
@@ -79,7 +88,7 @@ function ancestorsOf(user: Pick<User, "id" | "parentId">, users: Array<Pick<User
   const byId = new Map(users.map((item) => [item.id, item]));
   const result = new Set<string>();
   let current = user.parentId ? byId.get(user.parentId) : undefined;
-  while (current) {
+  while (current && !result.has(current.id)) {
     result.add(current.id);
     current = current.parentId ? byId.get(current.parentId) : undefined;
   }
@@ -89,10 +98,20 @@ function ancestorsOf(user: Pick<User, "id" | "parentId">, users: Array<Pick<User
 export async function getManagedUserIds(actor: User) {
   const users = await prisma.user.findMany({
     where: { organizationId: actor.organizationId, isActive: true },
-    select: { id: true, parentId: true },
+    select: { id: true, parentId: true, directorate: true },
   });
+
   if (actor.role === "ADMIN" || actor.role === "VP") return users.map((user) => user.id);
-  return descendantsOf(actor.id, users);
+
+  if (actor.role === "DIRECTOR") {
+    if (!actor.directorate) return [actor.id];
+    return users.filter((user) => user.id === actor.id || user.directorate === actor.directorate).map((user) => user.id);
+  }
+
+  const descendants = new Set(descendantsOf(actor.id, users));
+  return users
+    .filter((user) => descendants.has(user.id) && (user.id === actor.id || !actor.directorate || user.directorate === actor.directorate))
+    .map((user) => user.id);
 }
 
 export async function getChatReachableUsers(actor: User) {
@@ -103,12 +122,12 @@ export async function getChatReachableUsers(actor: User) {
 
   if (actor.role === "ADMIN" || actor.role === "VP") return users;
 
-  const managed = new Set(descendantsOf(actor.id, users));
+  const managed = new Set(await getManagedUserIds(actor));
   const ancestors = new Set(ancestorsOf(actor, users));
 
   return users.filter((candidate) => {
     if (candidate.id === actor.id || managed.has(candidate.id) || ancestors.has(candidate.id)) return true;
-    if (actor.team && candidate.team === actor.team) return true;
+    if (actor.team && candidate.team === actor.team && (!actor.directorate || candidate.directorate === actor.directorate)) return true;
     if (actor.role === "DIRECTOR" && actor.directorate && candidate.directorate === actor.directorate) return true;
     return false;
   });
