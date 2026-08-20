@@ -15,126 +15,119 @@ Enquanto isso:
 
 ## Matriz de capacidades
 
-| Área | Capacidade original | Evidência principal no `index.html` | `/proposta` | Next modular |
+| Área | Capacidade no index original | Evidência principal | `/proposta` | Next modular |
 | --- | --- | --- | --- | --- |
 | Autenticação | Entrada no app por perfil | `enterApp`, `resolveRole`, `updateRoleUI` | Preservada | Parcial: sessão/RBAC existe |
-| Perfis | Corretor, gerente, superintendente, diretor e VP | `ROLES`, `resolveRole` | Preservada | Migrada para BROKER/MANAGER/SUPERVISOR/DIRECTOR/VP/ADMIN |
+| Perfis | Corretor, gerente, superintendente, diretor e VP | `ROLES`, `resolveRole` | Preservada | BROKER/MANAGER/SUPERVISOR/DIRECTOR/VP/ADMIN |
 | Permissões | Visibilidade e ações por função | `setRole`, `updateRoleUI` | Preservada | Parcial |
 | Desktop | Navegação própria do produto | `dgo` | Preservada | Não equivalente |
 | Mobile | Fluxo/telas móveis próprias | `mgo`, `applyView` | Preservada | Não equivalente |
-| Propostas | Lista de propostas do corretor | `renderPropostas` | Preservada | Existe CRUD, sem paridade imobiliária |
+| Propostas | Lista das propostas guardadas | `renderPropostas` | Preservada | CRUD existe, sem paridade imobiliária |
 | Nova proposta | Fluxo de montagem imobiliária | tela `montar`, `boot` | Preservada | Pendente |
-| Assistente | Questionário guiado de 5 etapas | `openQuiz` | Preservada | Pendente |
+| Assistente | Questionário guiado | `openQuiz` | Preservada | Pendente |
 | Perfil financeiro | Renda familiar | questionário + proponentes | Preservada | Pendente |
-| Perfil profissional | CLT, autônomo, servidor, empresário, aposentado | `openQuiz` | Preservada | Pendente |
-| FGTS | Elegibilidade/uso de FGTS | questionário + regras | Preservada | Pendente |
-| Sinal | Faixas de entrada/sinal | `openQuiz` | Preservada | Pendente |
+| Perfil profissional | Vínculo profissional | `openQuiz` | Preservada | Pendente |
+| FGTS | Informação de FGTS usada na recomendação | `openQuiz`, `renderReco` | Preservada | Pendente |
+| Sinal | Faixas de valor disponível | `openQuiz` | Preservada | Pendente |
 | Unidades | Base de empreendimentos/unidades | `UNITS` | Preservada | Pendente |
-| Disponibilidade | Uso apenas de unidades disponíveis | `renderReco` | Preservada | Pendente |
+| Disponibilidade | Uso de unidades disponíveis | `renderReco` | Preservada | Pendente |
 | Recomendação | Ranking de unidades compatíveis | `renderReco` | Preservada | Pendente |
-| Unidade | Seleção/aplicação da recomendação | `applyReco`, `selectUnit` | Preservada | Pendente |
-| Empreendimento | Dados de empreendimento, unidade, andar, tipologia e área | `UNITS` + seleção | Preservada | Pendente |
-| Faixa de renda | `minRenda`/`maxRenda` por unidade | `UNITS`, `renderReco` | Preservada | Pendente |
+| Unidade | Aplicar recomendação à proposta | `applyReco`, `selectUnit` | Preservada | Pendente |
+| Empreendimento | Unidade, andar, tipologia, área e preço | `UNITS` + seleção | Preservada | Pendente |
+| Faixa de renda | Compatibilidade de renda por unidade | `UNITS`, `renderReco` | Preservada | Pendente |
 | Tipo de venda | CEF, direto e à vista | `derivedTvenda`, `onTvenda` | Preservada | Pendente |
-| Fluxo | Linhas de pagamento/parcelas | fluxo dinâmico | Preservada | Pendente |
+| Fluxo | Linhas de pagamento/parcelas | `buildRow`, fluxo dinâmico | Preservada | Pendente |
 | À vista | Conversão para ATO único | `onTvenda` | Preservada | Pendente |
-| CEF | Regime e regras específicas | `toggleRegime` | Preservada | Pendente |
-| Cálculo | Quantidade × valor e totalização | `calc` | Preservada | Pendente |
-| Renda | Limites baseados em renda | `calc` | Preservada | Pendente |
-| Financiamento | Valor financiado/sugerido/limites | `calc` | Preservada | Pendente |
-| Vencimentos | Datas e limites de vencimento | `calc` | Preservada | Pendente |
-| Validações | Bloqueios e alertas críticos | `calc`, chips de erro | Preservada | Pendente |
-| Cadeia de venda | Seleção obrigatória antes de enviar/PDF | `chainOk`, `tryEnviar`, `exportPDF` | Preservada | Pendente |
-| Comissão | SATI, credenciamento, prêmio, CCV e parceria | `calcCom`, `onParc` | Preservada | Pendente |
-| Limite de comissão | Validação de percentual total | `calcCom`, `MAX_COM_TOTAL` | Preservada | Pendente |
-| Datas de comissão | Validação dos pagamentos | `calcCom` | Preservada | Pendente |
-| Rascunhos | Guardar proposta localmente | `guardarProposta` | Preservada | Pendente no servidor |
+| CEF | Exibição do regime correspondente | `toggleRegime` | Preservada | Pendente |
+| Cálculo | Totalização e regras financeiras | `calc` | Preservada | Pendente |
+| Sugestão de fluxo | Sugestão e aplicação de condições | `suggest`, `applyAdvise` | Preservada | Pendente |
+| Vencimentos | Datas e regras do fluxo | `calc` | Preservada | Pendente |
+| Validações | Alertas/chips do motor de cálculo | `calc` | Preservada | Pendente |
+| Cadeia de venda | Cadeia obrigatória antes de enviar/PDF | `chainOk`, `tryEnviar`, `exportPDF` | Preservada | Pendente |
+| Consultor | Busca/preenchimento da cadeia comercial | `searchConsult`, `pickConsult` | Preservada | Pendente |
+| Comissão | Componentes e cálculo de comissão | `calcCom`, `onParc` | Preservada | Pendente |
+| Rascunhos | Guardar proposta no navegador | `guardarProposta` | Preservada | Pendente no servidor |
 | Snapshot | Capturar todo o estado da proposta | `captureState` | Preservada | Pendente |
 | Restauração | Reabrir rascunho completo | `restoreState` | Preservada | Pendente |
-| Persistência | Chaves `pp_salvas` e `pp_enviadas` em localStorage | `saveSaved`, `saveSent`, `loadSaved`, `loadSent` | Preservada | Pendente no banco |
+| Persistência | `propostamais_saved_v1` e `propostamais_sent_v1` | `saveSaved`, `saveSent`, `loadSaved`, `loadSent` | Preservada | Pendente no banco |
 | Envio | Enviar proposta para fila | `tryEnviar`, `sendProposal` | Preservada | Pendente |
-| Fila | Listagem/filtros da fila de aprovação | `renderFila` | Preservada | Pendente |
-| Aprovação | Gerente → superintendente → diretor → VP | `doApprove` + cadeia | Preservada | RBAC existe, fluxo imobiliário pendente |
-| Reprovação | Reprovar com atualização de estado | fluxo de reprovação | Preservada | Pendente |
-| Detalhe | Visualização completa da proposta enviada | `openSent`, `detExtras` | Preservada | Parcial |
-| PDF | Bloqueio quando cálculo é inválido | `pdfSafe` | Preservada | Pendente |
+| Fila | Listagem/filtros da fila | `renderFila` | Preservada | Pendente |
+| Aprovação | Ação conforme etapa/alçada | `doApprove` | Preservada | RBAC existe; fluxo imobiliário pendente |
+| Reprovação | Reprovar proposta | `doReprove` | Preservada | Pendente |
+| Detalhe | Visualização da proposta enviada | `openSent`, `detExtras` | Preservada | Parcial |
+| PDF | Valida unidade e cadeia antes de exportar | `exportPDF` | Preservada | Pendente |
 | PDF | Geração via jsPDF | `exportPDF` | Preservada | Pendente |
-| PDF | Proponentes, unidade, fluxo, cadeia e assinaturas | `exportPDF` | Preservada | Pendente |
-| PDF | Rodapé jurídico/CEF e naming do arquivo | `exportPDF` | Preservada | Pendente |
-| Admin | Tela de regras de cálculo | `renderAdmin` | Preservada | Admin de usuários existe, regras financeiras pendentes |
-| Admin | Sinal mínimo/máximo | regras editáveis | Preservada | Pendente |
-| Admin | Percentual/limite de financiamento | regras editáveis | Preservada | Pendente |
-| Admin | Subsídio máximo | regras editáveis | Preservada | Pendente |
-| Admin | Prazo de vencimento | regras editáveis | Preservada | Pendente |
-| Admin | Limite de propostas | regras editáveis | Preservada | Pendente |
-| Admin | Percentual de FGTS | regras editáveis | Preservada | Pendente |
-| Admin | Faixas e teto de CCV/comissão | regras editáveis | Preservada | Pendente |
-| Admin | Alçadas/faixas de aprovação | regras editáveis | Preservada | Pendente |
-| Resiliência | Dados e assets essenciais embutidos | monólito | Preservada | Pendente |
-| Offline local | Rascunhos e enviados permanecem no navegador | localStorage | Preservada | Não migrada para sincronização offline/servidor |
+| PDF | Proponentes, unidade, fluxo e dados comerciais | `exportPDF` | Preservada | Pendente |
+| Admin | Tela “Regras de cálculo” | `id="d_admin"` | Preservada visualmente | Pendente |
+| Admin | Comprometimento de renda CEF | inputs/tabela no `d_admin` | **Protótipo visual no original** | Pendente |
+| Admin | Renda e entrada mínimas | inputs no `d_admin` | **Protótipo visual no original** | Pendente |
+| Admin | Pós-chaves por tipologia | tabela no `d_admin` | **Protótipo visual no original** | Pendente |
+| Admin | Tetos HIS-1/HIS-2/HMP/R2V | tabela no `d_admin` | **Protótipo visual no original** | Pendente |
+| Admin | Descartar / Publicar v13 | botões sem handler no original | **Não funcional no original** | Pendente |
+| Resiliência | Assets/dados principais embutidos | monólito | Preservada | Pendente |
+| Offline local | Rascunhos/enviados no navegador | localStorage | Preservada | Sem sincronização offline/servidor |
+
+## Descoberta importante: o Admin original não está implementado
+
+A auditoria do código real mostrou que a seção **Regras de cálculo** existe no `index.html`, mas é um protótipo visual: os campos são inputs HTML e os botões **Descartar** e **Publicar v13** não possuem `onclick`, listener ou função de publicação associada.
+
+Portanto, essa parte não deve ser registrada como “função preservada”. Na reconstrução ela precisa virar uma função real: regras versionadas, persistidas, publicáveis e consumidas pelo motor de cálculo.
+
+Os valores apresentados pelo protótipo incluem:
+
+- comprometimento de renda CEF de 15%/10% para renda de R$ 2.000 a R$ 4.500;
+- comprometimento de 20%/10% acima de R$ 4.500;
+- renda mínima de R$ 2.000;
+- entrada mínima de R$ 500;
+- pós-chaves de 20% em 48 meses para Studio/Studio 24/1D;
+- 20% em 60 meses para 1D + Office;
+- 25% em 60 meses para 2D e unidades especiais;
+- regra textual de anuais/única até 150% para CLT com 24+ meses;
+- tetos de classificação HIS-1, HIS-2, HMP e R2V.
 
 ## Questionário original
 
-O assistente de proposta coleta, em sequência:
-
-1. identificação/nome da família;
-2. renda bruta familiar em faixas;
-3. vínculo profissional;
-4. disponibilidade/uso de FGTS;
-5. valor disponível para sinal.
-
-O resultado alimenta automaticamente proponentes/renda e a recomendação de unidades.
+O assistente coleta informações de identificação, renda, vínculo profissional, FGTS e sinal. O resultado alimenta automaticamente proponentes/renda e a recomendação de unidades.
 
 ## Recomendação de unidades
 
-A recomendação considera pelo menos:
-
-- `status === 'DISPONÍVEL'`;
-- faixa de renda mínima/máxima;
-- sinal disponível;
-- requisito de FGTS;
-- preço de venda;
-- ordenação e apresentação das melhores opções.
-
-Cada recomendação exibe empreendimento, unidade, andar, tipologia, área, renda compatível, preço e sinal, e pode ser aplicada diretamente à proposta.
+A recomendação usa a biblioteca `UNITS`, disponibilidade, renda, sinal/condições e dados da unidade para apresentar opções compatíveis e permitir sua aplicação direta à proposta.
 
 ## Motor financeiro
 
-O fluxo original não é um CRUD de itens. Ele é um motor de proposta imobiliária que trabalha com:
+O fluxo original não é um CRUD de produtos/serviços. É um motor imobiliário que trabalha com ATO/entrada, parcelas, vencimentos, condições, financiamento CEF, valor total, renda, tipo de venda derivado e validações.
 
-- ATO/entrada;
-- parcelas e quantidades;
-- datas de vencimento;
-- valores intercalados/correção;
-- financiamento CEF;
-- valor total da proposta;
-- relação entre renda, sinal e financiamento;
-- tipo de venda derivado automaticamente;
-- validações críticas que impedem envio/PDF quando necessário.
+Foi exatamente aqui que a primeira reconstrução perdeu paridade: a página modular de nova proposta passou a pedir descrição de item, quantidade e valor unitário, o que não representa o produto original.
 
 ## Comissão
 
-O cálculo original contempla componentes fixos/percentuais e parceria, verifica teto global e datas de pagamento e sincroniza o resultado com o estado da proposta. Uma futura implementação modular precisa reproduzir a mesma matemática e as mesmas validações antes de substituir `calcCom`.
+O `index.html` contém cálculo de comissão (`calcCom`) e opção de parceria (`onParc`). A implementação modular só pode substituir esse trecho depois de reproduzir a matemática e os mesmos dados da proposta.
 
 ## Persistência original
 
-O protótipo usa `localStorage` (`pp_salvas` e `pp_enviadas`). Isso volta a funcionar em `/proposta`, mas ainda **não equivale a persistência multiusuário no banco**. A migração deverá criar armazenamento server-side sem remover a capacidade de guardar/reabrir a proposta completa.
+O protótipo usa `localStorage` com as chaves reais:
+
+- `propostamais_saved_v1` para rascunhos;
+- `propostamais_sent_v1` para propostas enviadas.
+
+Isso volta a funcionar em `/proposta`, mas ainda **não equivale a persistência multiusuário no banco**. A migração server-side deve conservar o snapshot completo e a capacidade de reabrir a proposta.
 
 ## Aprovação
 
-A proposta enviada percorre a cadeia de alçada do produto. O usuário da etapa atual pode agir e a fila/detalhe são atualizados. O RBAC novo pode substituir essa parte somente quando a regra de estágio, histórico, rejeição e autoridade estiver reproduzida no backend.
+A proposta enviada entra na fila e o código mantém ações/histórico por alçada. O RBAC novo só deve substituir essa parte quando fila, estágio, histórico, aprovação, reprovação e autoridade estiverem reproduzidos no backend.
 
 ## PDF
 
-A geração original só é permitida para proposta válida e com cadeia de venda definida. O documento inclui dados do cliente/proponentes, unidade, fluxo, validações, cadeia/assinaturas e observação jurídica relacionada à aprovação CEF.
+`exportPDF` verifica ao menos a existência da unidade e da cadeia de venda antes de gerar o documento. A geração usa jsPDF e inclui os dados montados da proposta. Não existe uma função chamada `pdfSafe` no index atual; a auditoria e os testes agora usam somente marcadores realmente presentes no código.
 
 ## Critério para desligar `/proposta`
 
 A rota compatível só poderá ser removida quando:
 
-1. cada linha desta matriz estiver marcada como **Migrada com paridade**;
-2. houver teste automatizado para regras financeiras e aprovação;
-3. rascunhos e propostas persistirem no banco sem perder estado;
-4. desktop e mobile estiverem funcionais;
-5. PDF modular reproduzir os dados e bloqueios do original;
-6. a migração tiver sido validada com os perfis de corretor, gerente, supervisor/superintendente, diretor, VP e admin.
+1. cada capacidade funcional desta matriz estiver marcada como **Migrada com paridade**;
+2. os elementos que eram apenas protótipos visuais no index — especialmente publicação de regras — estiverem realmente implementados;
+3. houver testes automatizados para regras financeiras, comissão e aprovação;
+4. rascunhos e propostas persistirem no banco sem perder estado;
+5. desktop e mobile estiverem funcionais;
+6. PDF modular reproduzir os dados e guardas necessários;
+7. a migração tiver sido validada com corretor, gerente, supervisor/superintendente, diretor, VP e admin.
