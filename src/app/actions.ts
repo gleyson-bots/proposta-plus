@@ -8,6 +8,7 @@ import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { requireUser, SESSION_COOKIE } from "@/lib/auth";
 import { can, canManageUser, getChatReachableUsers, getManagedUserIds } from "@/lib/rbac";
+import { getDataScope } from "@/lib/scope";
 
 const loginSchema = z.object({
   email: z.string().trim().email(),
@@ -70,6 +71,7 @@ export async function createClient(formData: FormData) {
     },
   });
   revalidatePath("/clientes");
+  revalidatePath("/");
   redirect("/clientes");
 }
 
@@ -94,13 +96,8 @@ export async function createProposal(formData: FormData) {
     notes: formData.get("notes"),
   });
 
-  const managedIds = await getManagedUserIds(actor);
   const client = await prisma.client.findFirst({
-    where: {
-      id: parsed.clientId,
-      organizationId: actor.organizationId,
-      OR: [{ ownerId: null }, { ownerId: { in: managedIds } }],
-    },
+    where: { id: parsed.clientId, ...(await getDataScope(actor)) },
   });
   if (!client) throw new Error("Cliente fora do seu escopo.");
 
@@ -124,9 +121,8 @@ export async function createProposal(formData: FormData) {
 export async function updateProposalStatus(id: string, status: "DRAFT" | "SENT" | "VIEWED" | "ACCEPTED" | "REJECTED" | "EXPIRED") {
   const actor = await requireUser();
   if (!can(actor.role, "proposals:update")) throw new Error("Sem permissão para alterar propostas.");
-  const managedIds = await getManagedUserIds(actor);
   const proposal = await prisma.proposal.findFirst({
-    where: { id, organizationId: actor.organizationId, OR: [{ ownerId: null }, { ownerId: { in: managedIds } }] },
+    where: { id, ...(await getDataScope(actor)) },
   });
   if (!proposal) throw new Error("Proposta fora do seu escopo.");
 
@@ -225,17 +221,22 @@ export async function sendInternalMessage(conversationId: string, formData: Form
     await tx.internalConversation.update({ where: { id: conversationId }, data: { updatedAt: new Date() } });
   });
   revalidatePath("/chat");
+  revalidatePath("/designacoes");
 }
 
 export async function updateAssignmentStatus(assignmentId: string, status: "OPEN" | "IN_PROGRESS" | "DONE" | "CANCELED") {
   const actor = await requireUser();
   if (!can(actor.role, "assignments:update")) throw new Error("Sem permissão para atualizar designações.");
-  const assignment = await prisma.chatAssignment.findUnique({ where: { id: assignmentId } });
-  if (!assignment) throw new Error("Designação não encontrada.");
+  const assignment = await prisma.chatAssignment.findUnique({
+    where: { id: assignmentId },
+    include: { message: { include: { conversation: true } } },
+  });
+  if (!assignment || assignment.message.conversation.organizationId !== actor.organizationId) throw new Error("Designação não encontrada.");
 
   const allowed = assignment.assigneeId === actor.id || assignment.assignedById === actor.id || await canManageUser(actor, assignment.assigneeId);
   if (!allowed) throw new Error("Designação fora do seu escopo.");
 
   await prisma.chatAssignment.update({ where: { id: assignmentId }, data: { status } });
   revalidatePath("/chat");
+  revalidatePath("/designacoes");
 }
