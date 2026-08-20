@@ -12,6 +12,11 @@ async function upsertUser(organizationId: string, email: string, data: { name: s
   });
 }
 
+async function nextProposalNumber() {
+  const result = await prisma.proposal.aggregate({ _max: { number: true } });
+  return (result._max.number ?? 0) + 1;
+}
+
 async function main() {
   const organization = await prisma.organization.upsert({
     where: { slug: "proposta-plus" },
@@ -57,6 +62,7 @@ async function main() {
   if (!existingProposal) {
     await prisma.proposal.create({
       data: {
+        number: await nextProposalNumber(),
         organizationId: organization.id,
         ownerId: broker.id,
         clientId: client.id,
