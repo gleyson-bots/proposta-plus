@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
 enum ProposalStatus {
@@ -50,28 +50,28 @@ model Organization {
 }
 
 model User {
-  id                    String                @id @default(cuid())
-  organizationId        String
-  organization          Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  name                   String
-  email                  String
-  role                   UserRole
-  parentId               String?
-  parent                 User?                 @relation("UserHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
-  children               User[]                @relation("UserHierarchy")
-  directorate            String?
-  team                   String?
-  isActive               Boolean               @default(true)
-  sessions               Session[]
-  ownedClients           Client[]              @relation("ClientOwner")
-  ownedProposals         Proposal[]            @relation("ProposalOwner")
+  id                      String                 @id @default(cuid())
+  organizationId          String
+  organization            Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name                    String
+  email                   String
+  role                    UserRole
+  parentId                String?
+  parent                  User?                  @relation("UserHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children                User[]                 @relation("UserHierarchy")
+  directorate             String?
+  team                    String?
+  isActive                Boolean                @default(true)
+  sessions                Session[]
+  ownedClients            Client[]               @relation("ClientOwner")
+  ownedProposals          Proposal[]             @relation("ProposalOwner")
   conversationMemberships ChatParticipant[]
-  messages               InternalMessage[]
-  createdConversations   InternalConversation[] @relation("ConversationCreator")
-  assignmentsReceived    ChatAssignment[]       @relation("AssignmentAssignee")
-  assignmentsCreated     ChatAssignment[]       @relation("AssignmentCreator")
-  createdAt              DateTime               @default(now())
-  updatedAt              DateTime               @updatedAt
+  messages                InternalMessage[]
+  createdConversations    InternalConversation[] @relation("ConversationCreator")
+  assignmentsReceived     ChatAssignment[]       @relation("AssignmentAssignee")
+  assignmentsCreated      ChatAssignment[]       @relation("AssignmentCreator")
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @updatedAt
 
   @@unique([organizationId, email])
   @@index([organizationId, role])
@@ -124,7 +124,7 @@ model Proposal {
   title          String
   status         ProposalStatus @default(DRAFT)
   validUntil     DateTime?
-  discount       Decimal        @default(0) @db.Decimal(12, 2)
+  discount       Decimal        @default(0)
   notes          String?
   items          ProposalItem[]
   sentAt         DateTime?
@@ -144,8 +144,8 @@ model ProposalItem {
   proposalId  String
   proposal    Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   description String
-  quantity    Decimal  @default(1) @db.Decimal(10, 2)
-  unitPrice   Decimal  @db.Decimal(12, 2)
+  quantity    Decimal  @default(1)
+  unitPrice   Decimal
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
