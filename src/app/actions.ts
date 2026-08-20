@@ -9,6 +9,7 @@ import prisma from "@/lib/prisma";
 import { requireUser, SESSION_COOKIE } from "@/lib/auth";
 import { can, canManageUser, getChatReachableUsers, getManagedUserIds } from "@/lib/rbac";
 import { getDataScope } from "@/lib/scope";
+import { getNextProposalNumber } from "@/lib/proposal-number";
 
 const loginSchema = z.object({
   email: z.string().trim().email(),
@@ -101,8 +102,10 @@ export async function createProposal(formData: FormData) {
   });
   if (!client) throw new Error("Cliente fora do seu escopo.");
 
+  const number = await getNextProposalNumber();
   const proposal = await prisma.proposal.create({
     data: {
+      number,
       organizationId: actor.organizationId,
       ownerId: actor.id,
       clientId: client.id,
