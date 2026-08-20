@@ -114,7 +114,7 @@ model Client {
 
 model Proposal {
   id             String         @id @default(cuid())
-  number         Int            @unique @default(autoincrement())
+  number         Int            @unique
   organizationId String
   organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   ownerId        String?
