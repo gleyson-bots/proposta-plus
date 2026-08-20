@@ -1,15 +1,30 @@
 # Proposta Plus 2.0
 
-Reconstrução do protótipo original em uma aplicação full-stack organizada, usando **Next.js 16**, **React 19**, **Prisma 7** e **PostgreSQL**.
+Reconstrução do protótipo original em uma aplicação full-stack organizada, usando **Next.js 16**, **React 19**, **Prisma 7** e **SQLite**.
 
 > O `index.html` original foi mantido no repositório como referência do protótipo/fork durante a migração.
+
+## Banco de dados
+
+O projeto usa SQLite em dois modos:
+
+- **Desenvolvimento/local:** arquivo `prisma/dev.db` com `better-sqlite3` através de `@prisma/adapter-better-sqlite3`.
+- **Produção na Vercel:** Turso/libSQL através de `@prisma/adapter-libsql`.
+
+O runtime escolhe automaticamente o adapter em `src/lib/database-adapter.ts`.
+
+### Por que não usar o arquivo `.db` diretamente na Vercel?
+
+As Vercel Functions possuem filesystem efêmero. Um arquivo SQLite criado ou alterado durante uma execução não é um armazenamento compartilhado e persistente para as próximas requisições/instâncias. Por isso o projeto bloqueia o fallback para `better-sqlite3` quando detecta `VERCEL` e exige `TURSO_DATABASE_URL`.
+
+Dessa forma continuamos usando o ecossistema SQLite sem depender de PostgreSQL e sem risco de perder propostas, sessões, mensagens ou designações.
 
 ## O que já foi reconstruído
 
 - Dashboard comercial responsivo
 - Cadastro e listagem de clientes
 - Criação e listagem de propostas
-- Itens de proposta persistidos no PostgreSQL
+- Itens de proposta persistidos no SQLite
 - Valores, validade, observações e numeração automática
 - Pipeline de status: rascunho, enviada, visualizada, aceita, recusada e expirada
 - Página detalhada da proposta
@@ -20,7 +35,7 @@ Reconstrução do protótipo original em uma aplicação full-stack organizada, 
 - **Webchat interno com conversas diretas e salas de equipe**
 - **Designações dentro das mensagens com status de execução**
 - Painel de equipe e painel administrativo de hierarquia
-- Prisma 7 com driver adapter PostgreSQL
+- Prisma 7 + SQLite local/Turso
 - Seed de desenvolvimento
 
 ## RBAC e hierarquia
@@ -50,12 +65,11 @@ CORRETOR
 
 ### Regras importantes
 
-- O RBAC não depende apenas de esconder itens do menu: as consultas e Server Actions validam `organizationId`, proprietário e hierarquia.
+- O RBAC não depende apenas de esconder itens do menu: consultas e Server Actions validam `organizationId`, proprietário e hierarquia.
 - VP/Admin possuem acesso global dentro da organização.
-- Diretor nunca herda dados de outra diretoria: o campo `directorate` é uma barreira adicional ao relacionamento de superior/subordinado.
-- Supervisor e Gerente enxergam apenas a árvore abaixo deles.
-- Corretor não consegue consultar dados de outro corretor fora do seu escopo.
-- Dados legados sem `ownerId` ficam visíveis apenas para VP/Admin até serem atribuídos.
+- Diretor não herda dados de outra diretoria.
+- Supervisor e Gerente enxergam somente a árvore abaixo deles.
+- Corretor não consulta dados de outro corretor fora do seu escopo.
 - O painel VP/Admin impede superior de cargo igual/inferior e bloqueia ciclos hierárquicos.
 
 ## Webchat interno
@@ -69,20 +83,11 @@ Rotas principais:
 /admin         configuração da hierarquia, somente VP/Admin
 ```
 
-O chat possui:
-
-- conversa direta;
-- salas criadas por Gerente/Supervisor/Diretor/VP/Admin dentro do escopo permitido;
-- atualização automática da tela;
-- cargo de cada participante;
-- designação opcional ao enviar uma mensagem;
-- status `Aberta`, `Em andamento`, `Concluída` e `Cancelada`;
-- central de designações com atualização de status;
-- validação de participação e organização no servidor.
+O chat possui conversa direta, salas de equipe, atualização automática, cargo dos participantes e designações com status `Aberta`, `Em andamento`, `Concluída` e `Cancelada`.
 
 ## Perfis de homologação
 
-O seed cria os perfis usados no protótipo da Metrocasas:
+O seed cria:
 
 ```text
 corretor@metrocasas.com.br   Corretor
@@ -93,7 +98,52 @@ vp@metrocasas.com.br         VP
 admin@metrocasas.com.br      Admin
 ```
 
-**Durante a homologação qualquer senha não vazia é aceita.** Esse mecanismo é propositalmente de teste e deve ser substituído por autenticação real antes de uma publicação aberta ao público.
+Durante a homologação qualquer senha não vazia é aceita. Esse mecanismo deve ser substituído por autenticação real antes da publicação aberta ao público.
+
+## Desenvolvimento local
+
+Requisitos:
+
+- Node.js 20.19+ (recomendado Node 22 LTS ou superior)
+
+```bash
+npm install
+cp .env.example .env
+npm run db:migrate -- --name init
+npm run db:seed
+npm run dev
+```
+
+`.env` local:
+
+```env
+DATABASE_URL="file:./prisma/dev.db"
+```
+
+Acesse `http://localhost:3000/login`.
+
+Também estão disponíveis:
+
+```bash
+npm run db:push
+npm run db:studio
+npm run typecheck
+```
+
+## Deploy na Vercel
+
+Para produção, não envie `dev.db` para o Git e não use `file:` como banco da aplicação.
+
+Crie/conecte um banco **Turso Cloud** no projeto da Vercel e configure:
+
+```env
+TURSO_DATABASE_URL="libsql://seu-banco.turso.io"
+TURSO_AUTH_TOKEN="seu-token"
+```
+
+`DATABASE_URL` continua sendo usada pelas ferramentas locais do Prisma; o runtime da aplicação usa Turso quando `TURSO_DATABASE_URL` está presente.
+
+Antes do primeiro deploy, aplique o schema ao banco Turso seguindo o fluxo de migrations SQLite/libSQL da sua infraestrutura.
 
 ## Arquitetura
 
@@ -107,16 +157,10 @@ src/
     equipe/
     login/
     propostas/
-    actions.ts
-    globals.css
-    rbac-chat.css
-    layout.tsx
-    page.tsx
   components/
-    chat-refresh.tsx
-    sidebar.tsx
   lib/
     auth.ts
+    database-adapter.ts
     format.ts
     prisma.ts
     rbac.ts
@@ -127,56 +171,12 @@ prisma/
 prisma.config.ts
 ```
 
-## Requisitos
-
-- Node.js 20.19+ (recomendado Node 22 LTS ou superior)
-- PostgreSQL
-
-## Instalação
-
-```bash
-npm install
-cp .env.example .env
-npm run db:migrate -- --name init
-npm run db:seed
-npm run dev
-```
-
-Acesse `http://localhost:3000/login` e escolha um dos perfis de teste.
-
-## Banco de dados
-
-Configure `DATABASE_URL` no `.env`:
-
-```env
-DATABASE_URL="postgresql://usuario:senha@localhost:5432/proposta_plus"
-```
-
-O projeto pode usar PostgreSQL local ou serviços compatíveis, como Prisma Postgres, Neon, Supabase e Railway.
-
-## Scripts
-
-```bash
-npm run dev
-npm run build
-npm run typecheck
-npm run db:generate
-npm run db:migrate
-npm run db:seed
-npm run db:studio
-```
-
 ## Próximas etapas recomendadas
 
-1. Substituir o login de homologação por autenticação real com hash de senha/OAuth/SSO.
-2. Migrar as regras específicas ainda existentes no HTML legado.
-3. Implementar editor completo de propostas com múltiplos itens no formulário.
-4. Criar visualização pública por token e rastreamento de abertura.
-5. Gerar PDF e compartilhar proposta por e-mail/WhatsApp.
-6. Adicionar templates, produtos/serviços e condições comerciais reutilizáveis.
-7. Implementar assinatura/aceite do cliente e histórico de eventos.
-8. Trocar a atualização periódica do chat por transporte realtime dedicado quando a infraestrutura exigir múltiplas instâncias.
-
-## Estratégia de migração
-
-A nova aplicação não depende do JavaScript monolítico do `index.html`. O legado permanece somente como referência até que todos os fluxos úteis sejam identificados e migrados para módulos Next.js/Prisma.
+1. Substituir login de homologação por autenticação real.
+2. Implementar realtime dedicado no webchat.
+3. Adicionar notificações, anexos e menções no chat.
+4. Evoluir designações com prioridade e prazo.
+5. Implementar editor completo de propostas com múltiplos itens.
+6. Criar proposta pública por token, tracking, PDF e aceite/assinatura.
+7. Migrar as regras específicas restantes do HTML legado.
