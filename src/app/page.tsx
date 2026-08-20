@@ -2,14 +2,14 @@ import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { currency, shortDate, statusLabel } from "@/lib/format";
 import { requireUser } from "@/lib/auth";
-import { getManagedUserIds, ROLE_LABELS } from "@/lib/rbac";
+import { ROLE_LABELS } from "@/lib/rbac";
+import { getDataScope } from "@/lib/scope";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const actor = await requireUser();
-  const visibleIds = await getManagedUserIds(actor);
-  const scope = { organizationId: actor.organizationId, OR: [{ ownerId: null }, { ownerId: { in: visibleIds } }] };
+  const scope = await getDataScope(actor);
 
   const [proposals, clients] = await Promise.all([
     prisma.proposal.findMany({
