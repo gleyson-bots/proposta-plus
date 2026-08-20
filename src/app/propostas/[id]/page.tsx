@@ -2,27 +2,28 @@ import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { currency, shortDate, statusLabel } from "@/lib/format";
 import { updateProposalStatus } from "@/app/actions";
+import { requireUser } from "@/lib/auth";
+import { getManagedUserIds } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
 const statuses = ["DRAFT", "SENT", "VIEWED", "ACCEPTED", "REJECTED", "EXPIRED"] as const;
 
 export default async function ProposalDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const actor = await requireUser();
+  const visibleIds = await getManagedUserIds(actor);
   const { id } = await params;
-  let proposal = null;
-  try {
-    proposal = await prisma.proposal.findUnique({
-      where: { id },
-      include: { client: true, items: { orderBy: { sortOrder: "asc" } } },
-    });
-  } catch {}
+  const proposal = await prisma.proposal.findFirst({
+    where: { id, organizationId: actor.organizationId, OR: [{ ownerId: null }, { ownerId: { in: visibleIds } }] },
+    include: { client: true, owner: { select: { name: true } }, items: { orderBy: { sortOrder: "asc" } } },
+  });
   if (!proposal) notFound();
 
   const subtotal = proposal.items.reduce((sum, item) => sum + Number(item.quantity) * Number(item.unitPrice), 0);
   const total = subtotal - Number(proposal.discount);
 
   return <>
-    <header className="pageHeader"><div><p className="eyebrow">PROPOSTA #{proposal.number}</p><h1>{proposal.title}</h1><p className="subtitle">Criada em {shortDate(proposal.createdAt)} · {proposal.client.name}</p></div><span className={`badge ${proposal.status}`}>{statusLabel[proposal.status]}</span></header>
+    <header className="pageHeader"><div><p className="eyebrow">PROPOSTA #{proposal.number}</p><h1>{proposal.title}</h1><p className="subtitle">Criada em {shortDate(proposal.createdAt)} · {proposal.client.name} · Responsável: {proposal.owner?.name ?? "Legado"}</p></div><span className={`badge ${proposal.status}`}>{statusLabel[proposal.status]}</span></header>
 
     <section className="proposalHero">
       <div><div className="proposalNumber">CLIENTE</div><h2 style={{ margin: "6px 0 0" }}>{proposal.client.name}</h2><p className="subtitle">{proposal.client.company ?? proposal.client.email ?? proposal.client.phone ?? "Cliente cadastrado"}</p></div>
