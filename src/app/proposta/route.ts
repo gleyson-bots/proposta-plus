@@ -59,6 +59,12 @@ export async function GET(request: Request) {
       if (typeof dgo === 'function') dgo(land);
       if (typeof mgo === 'function') mgo(land);
       if (typeof applyView === 'function') applyView();
+
+      // O botão "Sair" do index antigo limpava apenas a UI local.
+      // No ambiente Next ele também precisa encerrar a sessão HTTP-only.
+      window.logout = function () {
+        window.location.assign('/logout');
+      };
     } catch (error) {
       console.error('[Proposta+ bridge] Falha ao iniciar protótipo autenticado', error);
     }
