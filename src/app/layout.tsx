@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./rbac-chat.css";
 import { Sidebar } from "@/components/sidebar";
+import { ShellBoundary } from "@/components/shell-boundary";
 import { getCurrentUser } from "@/lib/auth";
 
 export const metadata: Metadata = {
@@ -11,15 +12,16 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const user = await getCurrentUser();
+
   return (
     <html lang="pt-BR">
       <body>
-        {user ? (
-          <div className="appShell">
-            <Sidebar user={user} />
-            <main className="mainContent">{children}</main>
-          </div>
-        ) : children}
+        <ShellBoundary
+          authenticated={Boolean(user)}
+          sidebar={user ? <Sidebar user={user} /> : null}
+        >
+          {children}
+        </ShellBoundary>
       </body>
     </html>
   );
