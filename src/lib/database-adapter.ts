@@ -1,5 +1,5 @@
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
-import { PrismaLibSQL } from "@prisma/adapter-libsql";
+import { PrismaLibSql } from "@prisma/adapter-libsql";
 
 /**
  * Banco do Proposta Plus:
@@ -14,7 +14,7 @@ export function createDatabaseAdapter() {
   const tursoUrl = process.env.TURSO_DATABASE_URL?.trim();
 
   if (tursoUrl) {
-    return new PrismaLibSQL({
+    return new PrismaLibSql({
       url: tursoUrl,
       authToken: process.env.TURSO_AUTH_TOKEN?.trim(),
     });
