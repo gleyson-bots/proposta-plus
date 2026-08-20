@@ -1,12 +1,9 @@
-import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
-
-const connectionString = process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/proposta_plus";
-const adapter = new PrismaPg({ connectionString });
+import { createDatabaseAdapter } from "@/lib/database-adapter";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
+const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter: createDatabaseAdapter() });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
