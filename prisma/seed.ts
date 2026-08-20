@@ -1,9 +1,8 @@
 import "dotenv/config";
-import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { createDatabaseAdapter } from "../src/lib/database-adapter";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient({ adapter: createDatabaseAdapter() });
 
 async function upsertUser(organizationId: string, email: string, data: { name: string; role: "ADMIN" | "VP" | "DIRECTOR" | "SUPERVISOR" | "MANAGER" | "BROKER"; parentId?: string | null; directorate?: string | null; team?: string | null }) {
   return prisma.user.upsert({
