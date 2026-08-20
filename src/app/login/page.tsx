@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import { login } from "@/app/actions";
+import { login } from "@/app/login/actions";
 
 const testProfiles = [
   { email: "corretor@metrocasas.com.br", label: "Corretor" },
