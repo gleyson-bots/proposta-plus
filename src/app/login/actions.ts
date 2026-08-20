@@ -45,5 +45,7 @@ export async function login(formData: FormData) {
     maxAge: 7 * 24 * 60 * 60,
   });
 
-  redirect("/");
+  // Enquanto a migração modular acontece, o index.html original é o motor
+  // funcional canônico. Isso evita perder qualquer regra ou fluxo do protótipo.
+  redirect("/proposta");
 }
