@@ -4,12 +4,12 @@ import { login } from "@/app/login/actions";
 import styles from "./login.module.css";
 
 const testProfiles = [
-  { email: "corretor@metrocasas.com.br", label: "Corretor" },
-  { email: "gerente@metrocasas.com.br", label: "Gerente" },
-  { email: "sup@metrocasas.com.br", label: "Supervisor" },
-  { email: "diretor@metrocasas.com.br", label: "Diretor" },
-  { email: "vp@metrocasas.com.br", label: "VP" },
-  { email: "admin@metrocasas.com.br", label: "Admin" },
+  "corretor@metrocasas.com.br",
+  "gerente@metrocasas.com.br",
+  "sup@metrocasas.com.br",
+  "diretor@metrocasas.com.br",
+  "vp@metrocasas.com.br",
+  "admin@metrocasas.com.br",
 ];
 
 export default async function LoginPage() {
@@ -80,20 +80,17 @@ export default async function LoginPage() {
               Perfis de teste <span>(senha: qualquer)</span>
             </strong>
 
-            {testProfiles.map((profile) => (
-              <form action={login} className={styles.profileForm} key={profile.email}>
-                <input type="hidden" name="email" value={profile.email} />
+            {testProfiles.map((email) => (
+              <form action={login} className={styles.profileForm} key={email}>
+                <input type="hidden" name="email" value={email} />
                 <input type="hidden" name="password" value="teste" />
-                <button type="submit" className={styles.profileButton}>
-                  <span>{profile.email}</span>
-                  <span className={styles.profileRole}>{profile.label}</span>
-                </button>
+                <button type="submit" className={styles.profileButton}>{email}</button>
               </form>
             ))}
           </div>
 
           <p className={styles.policy}>
-            <span className={styles.version}>v2.0</span> · política CEF
+            <span className={styles.version}>v1.0</span> · política CEF
           </p>
         </div>
       </section>
