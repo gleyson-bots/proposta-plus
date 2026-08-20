@@ -1,39 +1,23 @@
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
-import { PrismaLibSql } from "@prisma/adapter-libsql";
 
-export function hasPersistentDatabase() {
-  return Boolean(process.env.TURSO_DATABASE_URL?.trim());
+export function getSqliteUrl() {
+  return process.env.VERCEL
+    ? "file:/tmp/proposta-plus.db"
+    : process.env.DATABASE_URL?.trim() || "file:./prisma/dev.db";
 }
 
 /**
- * Banco do Proposta Plus:
- * - Desenvolvimento/local: arquivo SQLite via better-sqlite3.
- * - Vercel/produção: Turso/libSQL, mantendo compatibilidade SQLite.
+ * Banco único do Proposta Plus: SQLite via better-sqlite3.
  *
- * Na Vercel sem Turso configurado nós NÃO derrubamos a renderização pública.
- * Um SQLite temporário em /tmp é criado apenas para permitir que módulos que
- * importam Prisma sejam carregados. As operações autenticadas validam a
- * configuração persistente antes de consultar o banco.
+ * Local: prisma/dev.db
+ * Vercel: /tmp/proposta-plus.db (efêmero entre cold starts/instâncias)
  */
 export function createDatabaseAdapter() {
-  const tursoUrl = process.env.TURSO_DATABASE_URL?.trim();
+  const url = getSqliteUrl();
 
-  if (tursoUrl) {
-    return new PrismaLibSql({
-      url: tursoUrl,
-      authToken: process.env.TURSO_AUTH_TOKEN?.trim(),
-    });
+  if (!url.startsWith("file:")) {
+    throw new Error("DATABASE_URL precisa usar SQLite no formato file:./caminho.db");
   }
 
-  const localUrl = process.env.VERCEL
-    ? "file:/tmp/proposta-plus-runtime.db"
-    : process.env.DATABASE_URL?.trim() || "file:./prisma/dev.db";
-
-  if (!localUrl.startsWith("file:")) {
-    throw new Error(
-      "DATABASE_URL precisa apontar para um arquivo SQLite local, por exemplo file:./prisma/dev.db.",
-    );
-  }
-
-  return new PrismaBetterSqlite3({ url: localUrl });
+  return new PrismaBetterSqlite3({ url });
 }
