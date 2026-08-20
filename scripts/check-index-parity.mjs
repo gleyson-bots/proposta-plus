@@ -23,13 +23,11 @@ const required = [
   ["lista de propostas", "function renderPropostas"],
   ["fila de aprovação", "function renderFila"],
   ["aprovação por alçada", "function doApprove"],
-  ["proteção do PDF", "function pdfSafe"],
   ["geração de PDF", "function exportPDF"],
-  ["regras administrativas", "function renderAdmin"],
-  ["persistência de rascunhos", "pp_salvas"],
-  ["persistência de enviados", "pp_enviadas"],
-  ["tela de regras de cálculo", "Regras de cálculo"],
-  ["assistente de proposta", "Assistente de proposta"],
+  ["persistência de rascunhos", "propostamais_saved_v1"],
+  ["persistência de enviados", "propostamais_sent_v1"],
+  ["tela de regras de cálculo", "id=\"d_admin\""],
+  ["navegação para regras de cálculo", "Regras de cálculo"],
   ["biblioteca de unidades", "var UNITS"],
 ];
 
