@@ -1,20 +1,25 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { createProposal } from "@/app/actions";
+import { requireUser } from "@/lib/auth";
+import { getManagedUserIds } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
 export default async function NewProposalPage() {
-  let clients: Array<{ id: string; name: string; company: string | null }> = [];
-  try {
-    clients = await prisma.client.findMany({ select: { id: true, name: true, company: true }, orderBy: { name: "asc" } });
-  } catch {}
+  const actor = await requireUser();
+  const visibleIds = await getManagedUserIds(actor);
+  const clients = await prisma.client.findMany({
+    where: { organizationId: actor.organizationId, OR: [{ ownerId: null }, { ownerId: { in: visibleIds } }] },
+    select: { id: true, name: true, company: true },
+    orderBy: { name: "asc" },
+  });
 
   return <>
     <header className="pageHeader">
-      <div><p className="eyebrow">NOVA NEGOCIAÇÃO</p><h1>Criar proposta</h1><p className="subtitle">Comece com o essencial. A estrutura já suporta múltiplos itens no banco.</p></div>
+      <div><p className="eyebrow">NOVA NEGOCIAÇÃO</p><h1>Criar proposta</h1><p className="subtitle">A nova proposta ficará vinculada a você e será visível apenas dentro da sua cadeia hierárquica.</p></div>
     </header>
-    {clients.length === 0 ? <div className="formCard"><h2>Cadastre um cliente primeiro</h2><p className="subtitle">Toda proposta precisa estar vinculada a um cliente.</p><div className="formActions"><Link href="/clientes/novo" className="button">Cadastrar cliente</Link></div></div> :
+    {clients.length === 0 ? <div className="formCard"><h2>Cadastre um cliente primeiro</h2><p className="subtitle">Toda proposta precisa estar vinculada a um cliente do seu escopo.</p><div className="formActions"><Link href="/clientes/novo" className="button">Cadastrar cliente</Link></div></div> :
     <form action={createProposal} className="formCard">
       <div className="formGrid">
         <div className="field full"><label htmlFor="clientId">Cliente *</label><select id="clientId" name="clientId" required defaultValue=""><option value="" disabled>Selecione um cliente</option>{clients.map((client) => <option key={client.id} value={client.id}>{client.name}{client.company ? ` · ${client.company}` : ""}</option>)}</select></div>
