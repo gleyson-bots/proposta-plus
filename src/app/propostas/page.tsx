@@ -1,11 +1,14 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
+import type { Prisma } from "@/generated/prisma/client";
 import { currency, shortDate, statusLabel } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
+type ProposalRow = Prisma.ProposalGetPayload<{ include: { client: true; items: true } }>;
+
 export default async function ProposalsPage() {
-  let proposals: Awaited<ReturnType<typeof prisma.proposal.findMany<{ include: { client: true; items: true } }>>> = [];
+  let proposals: ProposalRow[] = [];
   try {
     proposals = await prisma.proposal.findMany({
       include: { client: true, items: true },
