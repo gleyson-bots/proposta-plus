@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./rbac-chat.css";
 import { Sidebar } from "@/components/sidebar";
 import { getCurrentUser } from "@/lib/auth";
 
