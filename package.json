@@ -12,6 +12,7 @@
     "vercel-build": "prisma generate && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "check:index": "node scripts/check-index-parity.mjs",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
