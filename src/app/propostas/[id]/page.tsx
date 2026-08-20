@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { currency, shortDate, statusLabel } from "@/lib/format";
 import { updateProposalStatus } from "@/app/actions";
 import { requireUser } from "@/lib/auth";
-import { getManagedUserIds } from "@/lib/rbac";
+import { getDataScope } from "@/lib/scope";
 
 export const dynamic = "force-dynamic";
 
@@ -11,10 +11,9 @@ const statuses = ["DRAFT", "SENT", "VIEWED", "ACCEPTED", "REJECTED", "EXPIRED"] 
 
 export default async function ProposalDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const actor = await requireUser();
-  const visibleIds = await getManagedUserIds(actor);
   const { id } = await params;
   const proposal = await prisma.proposal.findFirst({
-    where: { id, organizationId: actor.organizationId, OR: [{ ownerId: null }, { ownerId: { in: visibleIds } }] },
+    where: { id, ...(await getDataScope(actor)) },
     include: { client: true, owner: { select: { name: true } }, items: { orderBy: { sortOrder: "asc" } } },
   });
   if (!proposal) notFound();
