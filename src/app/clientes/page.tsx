@@ -2,15 +2,14 @@ import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { shortDate } from "@/lib/format";
 import { requireUser } from "@/lib/auth";
-import { getManagedUserIds } from "@/lib/rbac";
+import { getDataScope } from "@/lib/scope";
 
 export const dynamic = "force-dynamic";
 
 export default async function ClientsPage() {
   const actor = await requireUser();
-  const visibleIds = await getManagedUserIds(actor);
   const clients = await prisma.client.findMany({
-    where: { organizationId: actor.organizationId, OR: [{ ownerId: null }, { ownerId: { in: visibleIds } }] },
+    where: await getDataScope(actor),
     include: { owner: { select: { name: true } } },
     orderBy: { createdAt: "desc" },
   });
